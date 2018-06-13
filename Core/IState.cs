@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace wFSM
+namespace wFsm
 {
     public interface IState : IPureState
     {
@@ -21,7 +21,7 @@ namespace wFSM
 
         void ChangeState(string name);
 
-        void PrivatePushState(string name);
+        void PushState(string name);
 
         void PopState();
 

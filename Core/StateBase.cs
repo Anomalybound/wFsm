@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace wFSM
+namespace wFsm
 {
     public abstract class StateBase : IState
     {
@@ -28,7 +28,7 @@ namespace wFSM
             ElapsedTime = 0f;
         }
 
-        public void Update(float deltaTime)
+        public virtual void Update(float deltaTime)
         {
             // Only update the lastest state
             if (_activeStates.Count > 0)
@@ -48,12 +48,12 @@ namespace wFSM
             }
         }
 
-        public void Exit()
+        public virtual void Exit()
         {
             if (OnExit != null) { OnExit.Invoke(); }
         }
 
-        public void ChangeState(string name)
+        public virtual void ChangeState(string name)
         {
             IState result;
             if (!_children.TryGetValue(name, out result))
@@ -66,7 +66,7 @@ namespace wFSM
             PrivatePushState(result);
         }
 
-        public void PrivatePushState(string name)
+        public void PushState(string name)
         {
             IState result;
             if (!_children.TryGetValue(name, out result))
@@ -171,13 +171,13 @@ namespace wFSM
             OnUpdate = onUpdate;
         }
 
-        public void SetEvent(string id, Action<EventArgs> action)
+        public void AddEvent(string id, Action<EventArgs> action)
         {
             if (!_events.ContainsKey(id)) { _events.Add(id, action); }
             else { throw new ApplicationException(string.Format("Event already exists: {0}", id)); }
         }
 
-        public void SetEvent<TArgs>(string id, Action<TArgs> action) where TArgs : EventArgs
+        public void AddEvent<TArgs>(string id, Action<TArgs> action) where TArgs : EventArgs
         {
             if (!_events.ContainsKey(id)) { _events.Add(id, arg => { action.Invoke((TArgs) arg); }); }
             else { throw new ApplicationException(string.Format("Event already exists: {0}", id)); }

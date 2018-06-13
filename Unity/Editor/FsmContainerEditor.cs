@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace wFSM.Unity
+namespace wFsm.Unity
 {
     [CustomEditor(typeof(FsmContainer), true)]
     public class FsmContainerEditor : Editor

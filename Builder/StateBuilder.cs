@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace wFSM.Builder
+namespace wFsm.Builder
 {
     public class StateBuilder<TState, TParentBuilder> where TState : StateBase, new()
     {
@@ -50,16 +50,16 @@ namespace wFSM.Builder
             return this;
         }
 
-        public StateBuilder<TState, TParentBuilder> Event(string id, Action<EventArgs> action)
+        public StateBuilder<TState, TParentBuilder> Event(string id, Action<TState, EventArgs> action)
         {
-            _state.SetEvent(id, action);
+            _state.AddEvent(id, args => action(_state, args));
             return this;
         }
 
-        public StateBuilder<TState, TParentBuilder> Event<TArgs>(string id, Action<TArgs> action)
+        public StateBuilder<TState, TParentBuilder> Event<TArgs>(string id, Action<TState, TArgs> action)
             where TArgs : EventArgs
         {
-            _state.SetEvent(id, action);
+            _state.AddEvent(id, args => action(_state, (TArgs) args));
             return this;
         }
 

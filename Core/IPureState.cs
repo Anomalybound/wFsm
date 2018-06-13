@@ -1,4 +1,4 @@
-﻿namespace wFSM
+﻿namespace wFsm
 {
     public interface IPureState
     {
