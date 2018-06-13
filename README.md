@@ -84,17 +84,23 @@ public IState AssemblyState()
         // Create a new state machine builder
         // will also create a root state 
         return new StateMachineBuilder<State>()
+        
             // Add new StateBase(SampleState here)
             .State<SampleState>("State1")
+            
                 // Set Enter Action
                 .OnEnter(OnStateEntered)
+                
                 // Add conditions (condition will check every frame)
                 .Condition(ShouldChange, state => Debug.Log("Condition1 met."))
                 .Condition(ShouldChange2, state => Debug.Log("Condition2 met."))
+                
                 // Add events (event action only get fired when event is triggered)
                 .Event("Push", (state, args) => state.Parent.PushState("State2"))
+                
             // End State construction, return to state machine builder
             .End()
+            
             // Return Root state
             // Add new StateBase(State here)
             .State("State2")
