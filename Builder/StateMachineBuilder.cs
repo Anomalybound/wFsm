@@ -1,24 +1,19 @@
 ﻿namespace wFSM.Builder
 {
-    public class StateMachineBuilder
+    public class StateMachineBuilder<TState> where TState : StateBase, new()
     {
         private StateBase _root;
 
         public StateMachineBuilder()
         {
-            _root = new State();
+            _root = new TState();
         }
 
         #region Fluent Actions
 
-        public StateBuilder<State, StateMachineBuilder> State(string stateName)
+        public StateBuilder<TState, StateMachineBuilder<TState>> State(string stateName)
         {
-            return new StateBuilder<State, StateMachineBuilder>(stateName, this, _root);
-        }
-
-        public StateBuilder<TState, StateMachineBuilder> State<TState>(string stateName) where TState : StateBase, new()
-        {
-            return new StateBuilder<TState, StateMachineBuilder>(stateName, this, _root);
+            return new StateBuilder<TState, StateMachineBuilder<TState>>(stateName, this, _root);
         }
 
         public StateBase Build()

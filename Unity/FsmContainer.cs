@@ -2,16 +2,17 @@
 
 namespace wFSM.Unity
 {
-    public abstract class FsmOwner : MonoBehaviour
+    public abstract class FsmContainer : MonoBehaviour
     {
-        private IState _root;
+        public IState Root { get; private set; }
+
         private bool _running;
 
         public abstract IState BuildState();
 
         protected virtual void Awake()
         {
-            _root = BuildState();
+            Root = BuildState();
         }
 
         protected virtual void OnEnable()
@@ -26,7 +27,7 @@ namespace wFSM.Unity
 
         protected virtual void Update()
         {
-            if (_running) { _root.Update(Time.deltaTime); }
+            if (_running) { Root.Update(Time.deltaTime); }
         }
     }
 }

@@ -1,22 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace wFSM
 {
-    public interface IState
+    public interface IState : IPureState
     {
         #region Properties
 
         IState Parent { get; set; }
 
-        #endregion
+        float ElapsedTime { get; }
 
-        #region Lifetime
+        Dictionary<string, IState> Children { get; }
 
-        void Enter();
-
-        void Update(float deltaTime);
-
-        void Exit();
+        Stack<IState> ActiveStates { get; }
 
         #endregion
 
@@ -24,9 +21,9 @@ namespace wFSM
 
         void ChangeState(string name);
 
-        void PushState(string name);
+        void PrivatePushState(string name);
 
-        void PopState(string name);
+        void PopState();
 
         void TriggerEvent(string id, EventArgs eventArgs);
 

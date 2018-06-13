@@ -9,21 +9,37 @@ namespace wFSM
 
         public IState Parent { get; set; }
 
+        public float ElapsedTime { get; private set; }
+
+        public Dictionary<string, IState> Children
+        {
+            get { return _children; }
+        }
+
+        public Stack<IState> ActiveStates
+        {
+            get { return _activeStates; }
+        }
+
         public virtual void Enter()
         {
             if (OnEnter != null) { OnEnter.Invoke(); }
+
+            ElapsedTime = 0f;
         }
 
         public void Update(float deltaTime)
         {
             // Only update the lastest state
-            if (_activeChidren.Count > 0)
+            if (_activeStates.Count > 0)
             {
-                _activeChidren.Peek().Update(deltaTime);
+                _activeStates.Peek().Update(deltaTime);
                 return;
             }
 
             if (OnUpdate != null) { OnUpdate.Invoke(deltaTime); }
+
+            ElapsedTime += deltaTime;
 
             // Check if condition meets
             foreach (var conditionPair in _conditions)
@@ -45,12 +61,12 @@ namespace wFSM
                 throw new ApplicationException(string.Format("Child state [{0}] not found.", name));
             }
 
-            if (_activeChidren.Count > 0) { PopState(); }
+            if (_activeStates.Count > 0) { PopState(); }
 
-            PushState(result);
+            PrivatePushState(result);
         }
 
-        public void PushState(string name)
+        public void PrivatePushState(string name)
         {
             IState result;
             if (!_children.TryGetValue(name, out result))
@@ -58,18 +74,17 @@ namespace wFSM
                 throw new ApplicationException(string.Format("Child state [{0}] not found.", name));
             }
 
-            PushState(result);
+//            if (_activeStates.Contains(result))
+//            {
+//                throw new ApplicationException(string.Format("State [{0}] already in stack.", name));
+//            }
+
+            PrivatePushState(result);
         }
 
-        public void PopState(string name)
+        public void PopState()
         {
-            IState result;
-            if (!_children.TryGetValue(name, out result))
-            {
-                throw new ApplicationException(string.Format("Child state [{0}] not found.", name));
-            }
-
-            PopState();
+            PrivatePopState();
         }
 
         public void TriggerEvent(string id)
@@ -79,9 +94,9 @@ namespace wFSM
 
         public void TriggerEvent(string id, EventArgs eventArgs)
         {
-            if (_activeChidren.Count > 0)
+            if (_activeStates.Count > 0)
             {
-                _activeChidren.Peek().TriggerEvent(id, eventArgs);
+                _activeStates.Peek().TriggerEvent(id, eventArgs);
                 return;
             }
 
@@ -106,7 +121,7 @@ namespace wFSM
 
         #region Runtime
 
-        private readonly Stack<IState> _activeChidren = new Stack<IState>();
+        private readonly Stack<IState> _activeStates = new Stack<IState>();
         private readonly Dictionary<string, IState> _children = new Dictionary<string, IState>();
         private readonly Dictionary<string, Action<EventArgs>> _events = new Dictionary<string, Action<EventArgs>>();
         private readonly Dictionary<Func<bool>, Action> _conditions = new Dictionary<Func<bool>, Action>();
@@ -115,15 +130,15 @@ namespace wFSM
 
         #region Private Operations
 
-        private void PopState()
+        private void PrivatePopState()
         {
-            var result = _activeChidren.Pop();
+            var result = _activeStates.Pop();
             result.Exit();
         }
 
-        private void PushState(IState state)
+        private void PrivatePushState(IState state)
         {
-            _activeChidren.Push(state);
+            _activeStates.Push(state);
             state.Enter();
         }
 
