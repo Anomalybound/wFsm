@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace wFsm.Unity
+namespace wLib.Fsm.Unity
 {
     public abstract class FsmContainer : MonoBehaviour
     {

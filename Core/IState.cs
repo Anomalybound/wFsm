@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace wFsm
+namespace wLib.Fsm
 {
     public interface IState : IPureState
     {

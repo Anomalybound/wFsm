@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace wFsm.Builder
+namespace wLib.Fsm.Builder
 {
     public class StateBuilder<TState, TParentBuilder> where TState : StateBase, new()
     {

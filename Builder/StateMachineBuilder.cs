@@ -1,4 +1,4 @@
-﻿namespace wFsm.Builder
+﻿namespace wLib.Fsm.Builder
 {
     public class StateMachineBuilder<TState> where TState : StateBase, new()
     {
