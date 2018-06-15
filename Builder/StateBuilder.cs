@@ -4,69 +4,81 @@ namespace wLib.Fsm.Builder
 {
     public class StateBuilder<TState, TParentBuilder> where TState : StateBase, new()
     {
-        private readonly TState _state;
-        private readonly TParentBuilder _builder;
+        public TState ContractState { get; }
+        public TParentBuilder ParentBuilder { get; }
 
-        public StateBuilder(string name, TParentBuilder builder, StateBase parent)
+        public StateBuilder(string name, TParentBuilder parentBuilder, StateBase parent)
         {
-            _builder = builder;
-            _state = new TState();
-            parent.AddChild(name, _state);
+            ParentBuilder = parentBuilder;
+            ContractState = new TState();
+            parent.AddChild(name, ContractState);
         }
 
         #region Fluent Actions
 
         public StateBuilder<State, StateBuilder<TState, TParentBuilder>> State(string name)
         {
-            return new StateBuilder<State, StateBuilder<TState, TParentBuilder>>(name, this, _state);
+            return new StateBuilder<State, StateBuilder<TState, TParentBuilder>>(name, this, ContractState);
         }
 
         public StateBuilder<T, StateBuilder<TState, TParentBuilder>> State<T>(string name) where T : StateBase, new()
         {
-            return new StateBuilder<T, StateBuilder<TState, TParentBuilder>>(name, this, _state);
+            return new StateBuilder<T, StateBuilder<TState, TParentBuilder>>(name, this, ContractState);
         }
 
         public StateBuilder<TState, TParentBuilder> OnEnter(Action<TState> action)
         {
-            _state.SetEnterAction(() => action(_state));
+            ContractState.SetEnterAction(() => action(ContractState));
             return this;
         }
 
         public StateBuilder<TState, TParentBuilder> OnExit(Action<TState> action)
         {
-            _state.SetExitAction(() => action(_state));
+            ContractState.SetExitAction(() => action(ContractState));
             return this;
         }
 
         public StateBuilder<TState, TParentBuilder> OnUpdate(Action<TState, float> action)
         {
-            _state.SetUpdateAction(deltaTime => action(_state, deltaTime));
+            ContractState.SetUpdateAction(deltaTime => action(ContractState, deltaTime));
             return this;
         }
 
         public StateBuilder<TState, TParentBuilder> Condition(Func<bool> predicate, Action<TState> action)
         {
-            _state.AddCondition(predicate, () => action(_state));
+            ContractState.AddCondition(predicate, () => action(ContractState));
             return this;
         }
 
         public StateBuilder<TState, TParentBuilder> Event(string id, Action<TState, EventArgs> action)
         {
-            _state.AddEvent(id, args => action(_state, args));
+            ContractState.AddEvent(id, args => action(ContractState, args));
             return this;
         }
 
         public StateBuilder<TState, TParentBuilder> Event<TArgs>(string id, Action<TState, TArgs> action)
             where TArgs : EventArgs
         {
-            _state.AddEvent(id, args => action(_state, (TArgs) args));
+            ContractState.AddEvent(id, args => action(ContractState, (TArgs) args));
             return this;
         }
 
         public TParentBuilder End()
         {
-            return _builder;
+            return ParentBuilder;
         }
+
+        #region Context State
+
+        public StateBuilder<TState, StateBuilder<TState, TParentBuilder>> State<TContext, TContextState>(string stateName, TContext context)
+            where TContextState : ContextState<TContext>, TState, new()
+        {
+            var builder = new StateBuilder<TContextState, StateBuilder<TState, TParentBuilder>>(stateName, this, ContractState);
+            builder.ContractState.SetContext(context);
+            return builder as StateBuilder<TState, StateBuilder<TState, TParentBuilder>>;
+        }
+
+        #endregion
 
         #endregion
     }

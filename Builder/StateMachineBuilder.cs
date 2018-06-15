@@ -26,6 +26,19 @@
             return _root;
         }
 
+        #region Context State
+
+        public StateBuilder<TState, StateMachineBuilder<TState>> State<TContext, TContextState>(string stateName,
+            TContext context)
+            where TContextState : ContextState<TContext>, TState, new()
+        {
+            var builder = new StateBuilder<TContextState, StateMachineBuilder<TState>>(stateName, this, _root);
+            builder.ContractState.SetContext(context);
+            return builder as StateBuilder<TState, StateMachineBuilder<TState>>;
+        }
+
+        #endregion
+
         #endregion
     }
 }

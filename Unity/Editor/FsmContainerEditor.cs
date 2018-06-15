@@ -1,7 +1,8 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using wLib.Fsm;
 
-namespace wLib.Fsm.Unity
+namespace wLib
 {
     [CustomEditor(typeof(FsmContainer), true)]
     public class FsmContainerEditor : Editor
@@ -34,11 +35,11 @@ namespace wLib.Fsm.Unity
         {
             var guiCol = GUI.contentColor;
             GUI.contentColor = GetStateColor(state);
-            EditorGUILayout.LabelField(string.Format("Name: {0} - Children: [{1}] - Active: [{2}]", stateName,
-                state.Children.Count, state.ActiveStates.Count));
+            EditorGUILayout.LabelField(string.Format("Name: {0}[{1}] - Children: [{2}] - Active: [{3}]", stateName,
+                state.GetType().FullName, state.Children.Count, state.ActiveStates.Count));
             GUI.contentColor = guiCol;
 
-            DrawChildren(state);
+            if (state.Children.Count > 0) { DrawChildren(state); }
         }
 
         private void DrawChildren(IState state)
@@ -63,7 +64,6 @@ namespace wLib.Fsm.Unity
                     var childState = pair.Value;
 
                     DrawState(stateName, childState);
-                    DrawChildren(childState);
                 }
             }
 
