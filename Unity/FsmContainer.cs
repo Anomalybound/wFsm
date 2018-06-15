@@ -5,7 +5,7 @@ namespace wLib
 {
     public abstract class FsmContainer : MonoBehaviour
     {
-        public IState Root { get; private set; }
+        public IState Root { get; protected set; }
 
         private bool _running;
 

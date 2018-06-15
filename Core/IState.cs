@@ -9,8 +9,6 @@ namespace wLib.Fsm
 
         IState Parent { get; set; }
 
-        float ElapsedTime { get; }
-
         Dictionary<string, IState> Children { get; }
 
         Stack<IState> ActiveStates { get; }
@@ -19,9 +17,9 @@ namespace wLib.Fsm
 
         #region Operations
 
-        void ChangeState(string name);
+        void ChangeState(string stateName);
 
-        void PushState(string name);
+        void PushState(string stateName);
 
         void PopState();
 
