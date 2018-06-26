@@ -7,11 +7,13 @@ using wLib.Fsm;
 
 namespace wLib.Procedure
 {
-    public abstract class ProcedureController<TProcedureIndex> : FsmContainer, IProcedureController
+    public abstract class GameProcedureController<TProcedureController, TProcedureIndex> : FsmContainer,
+        IProcedureController
+        where TProcedureController : GameProcedureController<TProcedureController, TProcedureIndex>
         where TProcedureIndex : struct, IConvertible
     {
-        private Dictionary<TProcedureIndex, GameProcedure<TProcedureIndex>> Indices =
-            new Dictionary<TProcedureIndex, GameProcedure<TProcedureIndex>>();
+        private Dictionary<TProcedureIndex, GameProcedure<TProcedureController, TProcedureIndex>> Indices =
+            new Dictionary<TProcedureIndex, GameProcedure<TProcedureController, TProcedureIndex>>();
 
         public TProcedureIndex Current;
 
@@ -20,14 +22,17 @@ namespace wLib.Procedure
             var root = new State();
 
             var types = GetType().Assembly.GetTypes()
-                .Where(x => typeof(GameProcedure<TProcedureIndex>).IsAssignableFrom(x));
+                .Where(x => typeof(GameProcedure<TProcedureController, TProcedureIndex>).IsAssignableFrom(x));
 
-            var instances = new List<GameProcedure<TProcedureIndex>>();
+            var instances = new List<GameProcedure<TProcedureController, TProcedureIndex>>();
             foreach (var type in types)
             {
-                var instance = Activator.CreateInstance(type) as GameProcedure<TProcedureIndex>;
-                instance.SetContext(this);
-                instances.Add(instance);
+                var instance = Activator.CreateInstance(type) as GameProcedure<TProcedureController, TProcedureIndex>;
+                if (instance != null)
+                {
+                    instance.SetContext((TProcedureController) this);
+                    instances.Add(instance);
+                }
             }
 
             instances = instances.OrderBy(x => x.Index).ToList();

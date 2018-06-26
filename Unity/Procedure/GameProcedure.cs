@@ -3,12 +3,14 @@ using System.Globalization;
 
 namespace wLib.Procedure
 {
-    public abstract class GameProcedure<TProcedureIndex> : ProcedureBase<ProcedureController<TProcedureIndex>>
+    public abstract class
+        GameProcedure<TProcedureController, TProcedureIndex> : ProcedureBase<TProcedureController>
+        where TProcedureController : GameProcedureController<TProcedureController, TProcedureIndex>
         where TProcedureIndex : struct, IConvertible
     {
         public abstract TProcedureIndex Index { get; }
 
-        public override void SetContext(ProcedureController<TProcedureIndex> context)
+        public override void SetContext(TProcedureController context)
         {
             base.SetContext(context);
             Init(context);
@@ -32,13 +34,13 @@ namespace wLib.Procedure
             Update(Context, deltaTime);
         }
 
-        public virtual void Init(ProcedureController<TProcedureIndex> controller) { }
+        public virtual void Init(TProcedureController controller) { }
 
-        public virtual void Enter(ProcedureController<TProcedureIndex> controller) { }
+        public virtual void Enter(TProcedureController controller) { }
 
-        public virtual void Exit(ProcedureController<TProcedureIndex> controller) { }
+        public virtual void Exit(TProcedureController controller) { }
 
-        public virtual void Update(ProcedureController<TProcedureIndex> controller, float deltaTime) { }
+        public virtual void Update(TProcedureController controller, float deltaTime) { }
 
         #region Facade
 
