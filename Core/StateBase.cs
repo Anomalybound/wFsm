@@ -23,7 +23,7 @@ namespace wLib.Fsm
 
         public virtual void Enter()
         {
-            if (OnEnter != null) { OnEnter.Invoke(); }
+            OnEnter?.Invoke();
 
             ElapsedTime = 0f;
         }
@@ -37,20 +37,20 @@ namespace wLib.Fsm
                 return;
             }
 
-            if (OnUpdate != null) { OnUpdate.Invoke(deltaTime); }
+            OnUpdate?.Invoke(deltaTime);
 
             ElapsedTime += deltaTime;
 
             // Check if condition meets
             foreach (var conditionPair in _conditions)
             {
-                if (conditionPair.Key.Invoke() && conditionPair.Value != null) { conditionPair.Value.Invoke(); }
+                if (conditionPair.Key.Invoke()) { conditionPair.Value?.Invoke(); }
             }
         }
 
         public virtual void Exit()
         {
-            if (OnExit != null) { OnExit.Invoke(); }
+            OnExit?.Invoke();
         }
 
         public virtual void ChangeState(string name)
@@ -106,7 +106,7 @@ namespace wLib.Fsm
                 throw new ApplicationException(string.Format("Event [{0}] not exits.", id));
             }
 
-            if (action != null) { action.Invoke(eventArgs); }
+            action?.Invoke(eventArgs);
         }
 
         #endregion
