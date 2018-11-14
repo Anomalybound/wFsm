@@ -1,0 +1,10 @@
+{
+    "name": "wFsm.Editor",
+    "references": [
+        "wFsm"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

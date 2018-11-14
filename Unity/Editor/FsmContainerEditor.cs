@@ -33,11 +33,10 @@ namespace wLib
 
         private void DrawState(string stateName, IState state)
         {
-            var guiCol = GUI.contentColor;
-            GUI.contentColor = GetStateColor(state);
-            EditorGUILayout.LabelField(string.Format("Name: {0}[{1}] - Children: [{2}] - Active: [{3}]", stateName,
-                state.GetType().FullName, state.Children.Count, state.ActiveStates.Count));
-            GUI.contentColor = guiCol;
+            var guiCol = EditorStyles.label.normal.textColor;
+            EditorStyles.label.normal.textColor = GetStateColor(state);
+            EditorGUILayout.LabelField($"Name: {stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveStates.Count}]");
+            EditorStyles.label.normal.textColor = guiCol;
 
             if (state.Children.Count > 0) { DrawChildren(state); }
         }
@@ -72,7 +71,7 @@ namespace wLib
 
         private Color GetStateColor(IState state)
         {
-            var col = Color.white;
+            var col = EditorStyles.label.normal.textColor;
             if (_activeState == state) { col = Color.green; }
 
             return col;

@@ -15,7 +15,9 @@ namespace wLib.Procedure
         private Dictionary<TProcedureIndex, GameProcedure<TProcedureController, TProcedureIndex>> Indices =
             new Dictionary<TProcedureIndex, GameProcedure<TProcedureController, TProcedureIndex>>();
 
-        public TProcedureIndex Current;
+        private Dictionary<IState, TProcedureIndex> IndexLookup = new Dictionary<IState, TProcedureIndex>();
+
+        public TProcedureIndex Current => IndexLookup[Root.ActiveStates.Peek()];
 
         public override IState BuildState()
         {
@@ -49,6 +51,7 @@ namespace wLib.Procedure
                 }
 
                 Indices.Add(id, instance);
+                IndexLookup.Add(instance, id);
                 root.AddChild(id.ToString(CultureInfo.InvariantCulture), instance);
             }
 

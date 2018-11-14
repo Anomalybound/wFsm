@@ -11,15 +11,9 @@ namespace wLib.Fsm
 
         public float ElapsedTime { get; private set; }
 
-        public Dictionary<string, IState> Children
-        {
-            get { return _children; }
-        }
+        public Dictionary<string, IState> Children { get; } = new Dictionary<string, IState>();
 
-        public Stack<IState> ActiveStates
-        {
-            get { return _activeStates; }
-        }
+        public Stack<IState> ActiveStates { get; } = new Stack<IState>();
 
         public virtual void Enter()
         {
@@ -30,10 +24,10 @@ namespace wLib.Fsm
 
         public virtual void Update(float deltaTime)
         {
-            // Only update the lastest state
-            if (_activeStates.Count > 0)
+            // Only update the latest state
+            if (ActiveStates.Count > 0)
             {
-                _activeStates.Peek().Update(deltaTime);
+                ActiveStates.Peek().Update(deltaTime);
                 return;
             }
 
@@ -56,12 +50,12 @@ namespace wLib.Fsm
         public virtual void ChangeState(string name)
         {
             IState result;
-            if (!_children.TryGetValue(name, out result))
+            if (!Children.TryGetValue(name, out result))
             {
-                throw new ApplicationException(string.Format("Child state [{0}] not found.", name));
+                throw new ApplicationException($"Child state [{name}] not found.");
             }
 
-            if (_activeStates.Count > 0) { PopState(); }
+            if (ActiveStates.Count > 0) { PopState(); }
 
             PrivatePushState(result);
         }
@@ -69,15 +63,10 @@ namespace wLib.Fsm
         public void PushState(string name)
         {
             IState result;
-            if (!_children.TryGetValue(name, out result))
+            if (!Children.TryGetValue(name, out result))
             {
-                throw new ApplicationException(string.Format("Child state [{0}] not found.", name));
+                throw new ApplicationException($"Child state [{name}] not found.");
             }
-
-//            if (_activeStates.Contains(result))
-//            {
-//                throw new ApplicationException(string.Format("State [{0}] already in stack.", name));
-//            }
 
             PrivatePushState(result);
         }
@@ -94,16 +83,16 @@ namespace wLib.Fsm
 
         public void TriggerEvent(string id, EventArgs eventArgs)
         {
-            if (_activeStates.Count > 0)
+            if (ActiveStates.Count > 0)
             {
-                _activeStates.Peek().TriggerEvent(id, eventArgs);
+                ActiveStates.Peek().TriggerEvent(id, eventArgs);
                 return;
             }
 
             Action<EventArgs> action;
             if (!_events.TryGetValue(id, out action))
             {
-                throw new ApplicationException(string.Format("Event [{0}] not exits.", id));
+                throw new ApplicationException($"Event [{id}] not exits.");
             }
 
             action?.Invoke(eventArgs);
@@ -121,8 +110,6 @@ namespace wLib.Fsm
 
         #region Runtime
 
-        private readonly Stack<IState> _activeStates = new Stack<IState>();
-        private readonly Dictionary<string, IState> _children = new Dictionary<string, IState>();
         private readonly Dictionary<string, Action<EventArgs>> _events = new Dictionary<string, Action<EventArgs>>();
         private readonly Dictionary<Func<bool>, Action> _conditions = new Dictionary<Func<bool>, Action>();
 
@@ -132,13 +119,13 @@ namespace wLib.Fsm
 
         private void PrivatePopState()
         {
-            var result = _activeStates.Pop();
+            var result = ActiveStates.Pop();
             result.Exit();
         }
 
         private void PrivatePushState(IState state)
         {
-            _activeStates.Push(state);
+            ActiveStates.Push(state);
             state.Enter();
         }
 
@@ -148,12 +135,12 @@ namespace wLib.Fsm
 
         public void AddChild(string name, IState state)
         {
-            if (!_children.ContainsKey(name))
+            if (!Children.ContainsKey(name))
             {
-                _children.Add(name, state);
+                Children.Add(name, state);
                 state.Parent = this;
             }
-            else { throw new ApplicationException(string.Format("Child state already exists: {0}", name)); }
+            else { throw new ApplicationException($"Child state already exists: {name}"); }
         }
 
         public void SetEnterAction(Action onEnter)
@@ -174,13 +161,13 @@ namespace wLib.Fsm
         public void AddEvent(string id, Action<EventArgs> action)
         {
             if (!_events.ContainsKey(id)) { _events.Add(id, action); }
-            else { throw new ApplicationException(string.Format("Event already exists: {0}", id)); }
+            else { throw new ApplicationException($"Event already exists: {id}"); }
         }
 
         public void AddEvent<TArgs>(string id, Action<TArgs> action) where TArgs : EventArgs
         {
             if (!_events.ContainsKey(id)) { _events.Add(id, arg => { action.Invoke((TArgs) arg); }); }
-            else { throw new ApplicationException(string.Format("Event already exists: {0}", id)); }
+            else { throw new ApplicationException($"Event already exists: {id}"); }
         }
 
         public void AddCondition(Func<bool> predicate, Action action)
