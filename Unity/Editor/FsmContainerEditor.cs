@@ -33,12 +33,33 @@ namespace wLib
 
         private void DrawState(string stateName, IState state)
         {
-            var guiCol = EditorStyles.label.normal.textColor;
-            EditorStyles.label.normal.textColor = GetStateColor(state);
-            EditorGUILayout.LabelField($"Name: {stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveStates.Count}]");
-            EditorStyles.label.normal.textColor = guiCol;
+            var active = _activeState == state;
+            if (active) { DrawActiveState(stateName, state); }
+            else { DrawNormalState(stateName, state); }
 
             if (state.Children.Count > 0) { DrawChildren(state); }
+        }
+
+        private void DrawNormalState(string stateName, IState state)
+        {
+            EditorGUILayout.LabelField(
+                $"Name: {stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveStates.Count}]");
+        }
+
+        private void DrawActiveState(string stateName, IState state)
+        {
+            var guiCol = GUI.skin.label.normal.textColor;
+
+            using (new GUILayout.HorizontalScope())
+            {
+                GUI.skin.label.normal.textColor = new Color(0f, 0.78f, 0.2f);
+                GUILayout.Label("\u2714", GUILayout.ExpandWidth(false));
+                GUI.skin.label.normal.textColor = guiCol;
+
+                EditorGUILayout.LabelField(
+                    $"Name: {stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveStates.Count}]",
+                    GUILayout.ExpandWidth(true));
+            }
         }
 
         private void DrawChildren(IState state)
@@ -69,12 +90,9 @@ namespace wLib
             EditorGUI.indentLevel--;
         }
 
-        private Color GetStateColor(IState state)
+        private static Color GetActiveStateColor()
         {
-            var col = EditorStyles.label.normal.textColor;
-            if (_activeState == state) { col = Color.green; }
-
-            return col;
+            return Color.green;
         }
     }
 }
