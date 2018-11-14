@@ -15,7 +15,7 @@ namespace wLib.Procedure
         private Dictionary<TProcedureIndex, GameProcedure<TProcedureController, TProcedureIndex>> Indices =
             new Dictionary<TProcedureIndex, GameProcedure<TProcedureController, TProcedureIndex>>();
 
-        private Dictionary<IState, TProcedureIndex> IndexLookup = new Dictionary<IState, TProcedureIndex>();
+        private readonly Dictionary<IState, TProcedureIndex> IndexLookup = new Dictionary<IState, TProcedureIndex>();
 
         public TProcedureIndex Current => IndexLookup[Root.ActiveStates.Peek()];
 
