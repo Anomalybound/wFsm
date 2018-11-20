@@ -52,13 +52,16 @@ namespace wLib
 
             using (new GUILayout.HorizontalScope())
             {
-                GUI.skin.label.normal.textColor = new Color(0f, 0.78f, 0.2f);
-                GUILayout.Label("\u2714", GUILayout.ExpandWidth(false));
-                GUI.skin.label.normal.textColor = guiCol;
-
                 EditorGUILayout.LabelField(
                     $"Name: {stateName}[{state.GetType().FullName}] - Children: [{state.Children.Count}] - Active: [{state.ActiveStates.Count}]",
                     GUILayout.ExpandWidth(true));
+
+                var rect = GUILayoutUtility.GetLastRect();
+                rect.width = 20;
+                
+                GUI.skin.label.normal.textColor = new Color(0f, 0.78f, 0.2f);
+                GUI.Label(rect, "\u2714");
+                GUI.skin.label.normal.textColor = guiCol;
             }
         }
 
