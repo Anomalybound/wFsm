@@ -163,3 +163,96 @@ public class SampleFsm : FsmContainer
 Also, `FsmContainer` has its editor inspector to help user debugging the FSM.
 
 ![inspector](https://github.com/cushmily/wFsm/blob/master/Docs/inspector.png?raw=true)
+
+
+
+### Game Procedure Controller
+
+Game procedure controller is a Unity specified component, based on `FsmContainer`.
+
+First, you can create a GameController that inherits from the GameProcedureController and create an enumeration for it to indicate the game states.
+
+```csharp
+using wLib.Procedure;
+
+public enum KarmaGameState
+{
+    Initialization,
+    MainMenu,
+	NewGame
+}
+
+public class KarmaGameController : GameProcedureController<KarmaGameController, KarmaGameState>
+{
+	public float SomeFloat;
+}
+```
+
+Then, you can create a GameProcedure for each state and assign them the corresponding state. If available, GameProcedureController will automatically enter first game procedure.
+
+```csharp
+using wLib.Procedure;
+
+public class InitializationProcedure : GameProcedure<KarmaGameController, KarmaGameState>
+    {
+    	// Setting represented state.
+        public override KarmaGameState Index => KarmaGameState.Initialization;
+
+        /// <summary>
+        /// Enter will be called whenever controller change to this state.
+        /// </summary>
+        /// <param name="controller"></param>
+        public override void Enter(KarmaGameController controller) { }
+
+        /// <summary>
+        /// Exit will be called whenever controller left this state.
+        /// </summary>
+        /// <param name="controller"></param>
+        public override void Exit(KarmaGameController controller) { }
+
+        /// <summary>
+        /// Init will be called after setting a context.
+        /// </summary>
+        /// <param name="controller"></param>
+        public override void Init(KarmaGameController controller) { }
+
+        /// <summary>
+        /// Update will be called in every controller update step. 
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <param name="deltaTime"></param>
+        public override void Update(KarmaGameController controller, float deltaTime) { }
+
+        /// <summary>
+        /// The controller instance.
+        /// </summary>
+        public override KarmaGameController Context { get; protected set; }
+    }
+```
+
+Game Procedure is inherited from StateBase so that you can still do Add Event/Condition actions.
+
+```csharp
+// Add events
+procedure.AddEvent("eventId", args => {});
+
+// Add conditions
+procedure.AddCondition(() => false, () => { });
+```
+
+Game Procedure Controller is inherited from FsmCotnaier so that you can still do push/pop actions.
+
+```csharp
+// Directly change state, ignore current stack.
+controller.ChangeState(KarmaGameState.NewGame);
+
+// Push a new state into stack.
+controller.PushState(KarmaGameState.NewGame);
+
+// Pop the toppeest state of the stack.
+controller.PopState();
+
+// Trigger a event with some args.
+controller.TriggerEvent("eventId", EventArgs.Empty);
+```
+
